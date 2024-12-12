@@ -1,6 +1,6 @@
 ---
 title: "Entrega grupal"
-author: "David Repullo (DNI: 00000000-X), Rosalía (DNI: 00000000-X), ..."
+author: "David Repullo (DNI: 00000000-X), Chantal Zabala (DNI: 00000000-X), Rosalía (DNI: 00000000-X), ..."
 format:
   revealjs:
     theme: [style.scss]
