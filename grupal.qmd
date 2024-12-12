@@ -206,7 +206,7 @@ Recuerda que el objetivo real es demostrar un dominio de las herramientas vistas
 
 Deberéis tenerlo todo subido a Github con el enlace generado de manera correcta.
 
-## ENTREGA GRUPAL 
+## ENTREGA GRUPAL
 
 Nos quedamos con los datos del 2008 al 2019 de las elecciones. Después filtramos las encuestas por las mismas fechas, que no sean a pie de campo y que tenga un tamaño mayor que 500. Después nos quedamos con las encuestas que han estado mas de un dia "activas"
 
