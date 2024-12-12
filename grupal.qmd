@@ -211,6 +211,7 @@ Deberéis tenerlo todo subido a Github con el enlace generado de manera correcta
 Nos quedamos con los datos del 2008 al 2019 de las elecciones. Después filtramos las encuestas por las mismas fechas, que no sean a pie de campo y que tenga un tamaño mayor que 500. Después nos quedamos con las encuestas que han estado mas de un dia "activas"
 
 ```{r}
+#| code-fold: true
 election <- election_data |> 
   filter(between(anno, 2008, 2019))
 surveys <- surveys |> 
