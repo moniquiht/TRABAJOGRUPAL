@@ -1,6 +1,10 @@
+```{r}
+
+```
+
 ---
 title: "Entrega grupal"
-author: "David Repullo (DNI: 00000000-X), Chantal Zabala (DNI: 00000000-X), Rosalía (DNI: 00000000-X), ..."
+author: "David Repullo DNI: 05996834-K, Mónica Hortalá DNI: 02789123-M, Laura Lora DNI: 54195078-V, Chantal Zabala DNI: 71986129-Q"
 format:
   revealjs:
     theme: [style.scss]
@@ -32,6 +36,13 @@ execute:
 ```{r}
 rm(list = ls())
 library(tidyverse)
+library(lubridate)
+library(glue)
+library(ggplot2)
+library(plotly)
+library(forcats)
+library(showtext)
+library(sysfonts)
 ```
 
 ------------------------------------------------------------------------
@@ -206,23 +217,76 @@ Recuerda que el objetivo real es demostrar un dominio de las herramientas vistas
 
 Deberéis tenerlo todo subido a Github con el enlace generado de manera correcta.
 
+## ENTREGA GRUPAL
 
-## ENTREGA GRUPAL 
+------------------------------------------------------------------------
 
-Nos quedamos con los datos del 2008 al 2019 de las elecciones. Después filtramos las encuestas por las mismas fechas, que no sean a pie de campo y que tenga un tamaño mayor que 500. Después nos quedamos con las encuestas que han estado mas de un dia "activas"
-#| code-fold: true (para colpsar codigo)
+## PREPARACIÓN DATOS
 
 ```{r}
-#| echo: false
-election <- election_data |> 
-  filter(between(anno, 2008, 2019))
-surveys <- surveys |> 
-  filter(between(date_elec, as_date("2008-01-01"), as_date("2019-01-01"))) |> 
-  filter(exit_poll == FALSE) |> 
-  filter(size > 500) |> 
-  drop_na(size) |> 
-  filter((field_date_to - field_date_from) > 1) |> 
-  pivot_longer(cols = c("UCD" : "EV"), names_to = "siglas", values_to = "% votos") |> drop_na() 
+#| code-fold: true
+
+datos <- election_data |>
+  pivot_longer(cols="BERDEAK-LOS VERDES":"COALICIÓN POR MELILLA",names_to = "partidos",values_to="votos",values_drop_na=TRUE) |>  select(-tipo_eleccion, -vuelta, -codigo_distrito_electoral) 
+
+datos<- datos |> 
+  mutate(siglas = case_when( str_detect(partidos,"PARTIDO SOCIALISTA OBRERO ESPAÑOL|PARTIT DELS SOCIALISTES DE CATALUNYA|PARTIDO DOS SOCIALISTAS DE GALICIA")~"PSOE",
+                            str_detect(partidos,"PARTIDO POPULAR")~"PP",
+                            str_detect(partidos,"CIUDADANOS|CIUTADANS")~"CS",                                  str_detect(partidos,"PODEMOS|UNIDAS PODEMOS|UNIDOS PODEMOS|EN COMÚ PODEM|BERDEAK-LOS VERDES")~"UP",
+                            str_detect(partidos,"EUZKO ALDERDI JELTZALEA-PARTIDO NACIONALISTA VASCO")~"EAJ-PNV",
+                          str_detect(partidos,"BLOQUE NACIONALISTA GALEGO")~"BNG",
+                          str_detect(partidos,"BLOC-INICIATIVA-VERDS-EQUO-COALICIÓ COMPROMÍS|COMPROMÍS-PODEMOS-ÉS EL MOMENT|COMPROMÍS-PODEMOS-EUPV: A LA VALENCIANA|COMPROMÍS: BLOC-INICIATIVA-VERDSEQUO|MÉS COMPROMÍS")~"COMPROMIS",
+                          str_detect(partidos,"CONVERGENCIA I UNIO")~"CIU",
+                          str_detect(partidos,"ESQUERRA REPUBLICANA DE CATALUNYA")~"ERC",
+                          str_detect(partidos,"MÁS PAÍS")~"MP",
+                          str_detect(partidos,"VOX")~"VOX",
+                          str_detect(partidos,"EUSKAL HERRIA BILDU")~"EH-BILDU",
+                           TRUE~"OTROS")) |>
+  mutate(fecha = ymd(glue("{anno}{mes}01")), cod_mun = glue("{codigo_ccaa}-{codigo_provincia}-{codigo_municipio}")) |> 
+  relocate(fecha,.after=mes) |> 
+  relocate(cod_mun,.after=codigo_municipio) |>
+  mutate(votos = sum(votos), .by = c(fecha, cod_mun, siglas)) |>
+  distinct(fecha, cod_mun, siglas, .keep_all = TRUE)
 
 
+
+
+
+encuestas<- surveys |> pivot_longer(cols="UCD":"EV",names_to="partidos", values_to="estimacion",values_drop_na=TRUE) |> drop_na(size) |> 
+  filter(size>750 & exit_poll==FALSE & year(date_elec)>"2007"  & 
+           (field_date_to-field_date_from)>1)
+tema_favorito <-   theme_minimal() + 
+  theme(plot.title = element_text(face = "bold", size = 25, color = "#83D2F2"), 
+        panel.background = element_rect(fill = "#E891D0"), 
+        legend.position = "bottom")
+```
+
+------------------------------------------------------------------------
+
+### ¿Cómo se reparte el voto de partidos de ámbito nacional frente a los partidos de corte autonómico o nacionalista?
+
+```{r}
+partidos_nacionales <- c("PP", "PSOE", "VOX", "UP", "MP", "UNIDAS PODEMOS"," CS")  #determinamos los paises nacionale
+
+#sumamos todos los votos que han conseguido cada partido
+suma <-
+  datos |> 
+  group_by(siglas) |> 
+  summarise(total_votos = sum(votos))   
+suma
+# Creamos 'grupo' para distinguir entre nacional y autonómico
+nacional_autonomo <- 
+  suma |> 
+  mutate(grupo = ifelse(siglas %in% partidos_nacionales, "Nacional", "Autonomico"))
+nacional_autonomo
+# Sumamos los votos por grupo
+suma_grupo <- nacional_autonomo |> 
+  group_by(grupo) |> 
+  summarise(total_votos = sum(total_votos))
+suma_grupo
+# Calcula el porcentaje del total
+porcentaje_grupo <- 
+  suma_grupo |> 
+  mutate(porcentaje = total_votos / sum(total_votos) * 100)
+porcentaje_grupo
 ```
