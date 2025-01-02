@@ -290,3 +290,7 @@ porcentaje_grupo <-
   mutate(porcentaje = total_votos / sum(total_votos) * 100)
 porcentaje_grupo
 ```
+
+```{r}
+#Prueba github desktop·
+```
