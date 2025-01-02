@@ -226,6 +226,31 @@ Deberéis tenerlo todo subido a Github con el enlace generado de manera correcta
 ```{r}
 #| code-fold: true
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+
+datos <- election_data |>
+  pivot_longer(cols="BERDEAK-LOS VERDES":"COALICIÓN POR MELILLA",names_to = "partidos",values_to="votos",values_drop_na=TRUE) |>  select(-tipo_eleccion, -vuelta, -codigo_distrito_electoral) 
+
+datos<- datos |> 
+  mutate(siglas = case_when( str_detect(partidos,"PARTIDO SOCIALISTA OBRERO ESPAÑOL|PARTIT DELS SOCIALISTES DE CATALUNYA|PARTIDO DOS SOCIALISTAS DE GALICIA")~"PSOE",
+                            str_detect(partidos,"PARTIDO POPULAR")~"PP",
+                            str_detect(partidos,"CIUDADANOS|CIUTADANS")~"CS",                                  str_detect(partidos,"PODEMOS|UNIDAS PODEMOS|UNIDOS PODEMOS|EN COMÚ PODEM|BERDEAK-LOS VERDES")~"UP",
+                            str_detect(partidos,"EUZKO ALDERDI JELTZALEA-PARTIDO NACIONALISTA VASCO")~"EAJ-PNV",
+                          str_detect(partidos,"BLOQUE NACIONALISTA GALEGO")~"BNG",
+                          str_detect(partidos,"BLOC-INICIATIVA-VERDS-EQUO-COALICIÓ COMPROMÍS|COMPROMÍS-PODEMOS-ÉS EL MOMENT|COMPROMÍS-PODEMOS-EUPV: A LA VALENCIANA|COMPROMÍS: BLOC-INICIATIVA-VERDSEQUO|MÉS COMPROMÍS")~"COMPROMIS",
+                          str_detect(partidos,"CONVERGENCIA I UNIO")~"CIU",
+                          str_detect(partidos,"ESQUERRA REPUBLICANA DE CATALUNYA")~"ERC",
+                          str_detect(partidos,"MÁS PAÍS")~"MP",
+                          str_detect(partidos,"VOX")~"VOX",
+                          str_detect(partidos,"EUSKAL HERRIA BILDU")~"EH-BILDU",
+                           TRUE~"OTROS")) |>
+  mutate(fecha = ymd(glue("{anno}{mes}01")), cod_mun = glue("{codigo_ccaa}-{codigo_provincia}-{codigo_municipio}")) |> 
+  relocate(fecha,.after=mes) |> 
+  relocate(cod_mun,.after=codigo_municipio) |>
+  mutate(votos = sum(votos), .by = c(fecha, cod_mun, siglas)) |>
+  distinct(fecha, cod_mun, siglas, .keep_all = TRUE)
+=======
+>>>>>>> Stashed changes
 
 datos <- election_data |>
   pivot_longer(cols="BERDEAK-LOS VERDES":"COALICIÓN POR MELILLA",names_to = "partidos",values_to="votos",values_drop_na=TRUE) |>  select(-tipo_eleccion, -vuelta, -codigo_distrito_electoral) 
@@ -298,6 +323,30 @@ partido_ganador <- datos|>
 
 partido_ganador
 
+encuestas<- surveys |> pivot_longer(cols="UCD":"EV",names_to="partidos", values_to="estimacion",values_drop_na=TRUE) |> drop_na(size) |> 
+  filter(size>750 & exit_poll==FALSE & year(date_elec)>"2007"  & 
+           (field_date_to-field_date_from)>1)
+
+tema_favorito <-   theme_minimal() + 
+  theme(plot.subtitle = element_text(face = "bold", size = 8, color = "#7C7A7A"), legend.position = "bottom")
+```
+
+------------------------------------------------------------------------
+
+### ¿Qué partido fue el ganador en los municipios con más de 100.000 habitantes (censo) en cada una de las elecciones?
+
+```{r}
+#| code-fold: true
+
+partido_ganador <- datos|>
+  filter(censo>100000) |> # Filtro los municipios que importan
+  group_by(fecha,cod_mun) |> #agrupo por fecha y municipio
+  select(fecha,cod_mun,censo,siglas,votos) |> #seleccionamos solo lo relevante 
+  slice_max(votos) |> #cogemos al ganador(el que tiene más votos)
+  left_join(cod_mun,by="cod_mun") # traemos los municipios
+
+partido_ganador
+
 
 
 
@@ -338,6 +387,26 @@ porcentaje_grupo <-
   suma_grupo |> 
   mutate(porcentaje = total_votos / sum(total_votos) * 100)
 porcentaje_grupo
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| code-fold: true
+
+ggplot(partido_ganador)+
+  geom_bar(aes(x=siglas,fill=siglas))+
+  scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#4282D3", ERC = "#EEB661", "PSOE" = "#FF1616","UP" = "#A707FD","VOX"="#44C22B", "OTROS"="#889B98"))+
+  labs(x="partidos",y="victorias", title = "¿Qué partido fue el ganador en cada una de las elecciones?", subtitle = "En los municipios con más de 100.000 habitantes (censo)")+
+  facet_wrap(~fecha) +
+  tema_favorito +
+  coord_flip()
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#PREGUNTA 2
 ```
 
 ------------------------------------------------------------------------
