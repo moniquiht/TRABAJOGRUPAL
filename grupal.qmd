@@ -249,6 +249,7 @@ datos<- datos |>
   distinct(fecha, cod_mun, siglas, .keep_all = TRUE)
 
 
+<<<<<<< Updated upstream
 datos <- election_data |>
   pivot_longer(cols="BERDEAK-LOS VERDES":"COALICIÓN POR MELILLA",names_to = "partidos",values_to="votos",values_drop_na=TRUE) |>  select(-tipo_eleccion, -vuelta, -codigo_distrito_electoral) 
 
@@ -317,6 +318,8 @@ datos<- datos |>
   distinct(fecha, cod_mun, siglas, .keep_all = TRUE)
 
 
+=======
+>>>>>>> Stashed changes
 encuestas<- surveys |> pivot_longer(cols="UCD":"EV",names_to="partidos", values_to="estimacion",values_drop_na=TRUE) |> drop_na(size) |> 
   filter(size>750 & exit_poll==FALSE & year(date_elec)>"2007"  & 
            (field_date_to-field_date_from)>1)
@@ -340,6 +343,7 @@ partido_ganador <- datos|>
   left_join(cod_mun,by="cod_mun") # traemos los municipios
 
 partido_ganador
+<<<<<<< Updated upstream
 
 encuestas<- surveys |> pivot_longer(cols="UCD":"EV",names_to="partidos", values_to="estimacion",values_drop_na=TRUE) |> drop_na(size) |> 
   filter(size>750 & exit_poll==FALSE & year(date_elec)>"2007"  & 
@@ -489,5 +493,27 @@ ggplot(partido_ganador)+
 
 ```{r}
 #PREGUNTA 2 (laura)
+=======
+>>>>>>> Stashed changes
 
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| code-fold: true
+
+ggplot(partido_ganador)+
+  geom_bar(aes(x=siglas,fill=siglas))+
+  scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#4282D3", ERC = "#EEB661", "PSOE" = "#FF1616","UP" = "#A707FD","VOX"="#44C22B", "OTROS"="#889B98"))+
+  labs(x="partidos",y="victorias", title = "¿Qué partido fue el ganador en cada una de las elecciones?", subtitle = "En los municipios con más de 100.000 habitantes (censo)")+
+  facet_wrap(~fecha) +
+  tema_favorito +
+  coord_flip()
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#PREGUNTA 2
 ```
