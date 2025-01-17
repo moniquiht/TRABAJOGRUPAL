@@ -1,7 +1,3 @@
-```{r}
-
-```
-
 ---
 title: "Entrega grupal"
 author: "David Repullo DNI: 05996834-K, Mónica Hortalá DNI: 02789123-M, Laura Lora DNI: 54195078-V, Chantal Zabala DNI: 71986129-Q"
@@ -273,7 +269,6 @@ partido_ganador <- datos |>
   slice_max(votos) |> #cogemos al ganador(el que tiene más votos)
   left_join(cod_mun,by="cod_mun") # traemos los municipios
 
-partido_ganador
 ```
 
 ------------------------------------------------------------------------
@@ -283,14 +278,15 @@ partido_ganador
 
 ggplot(partido_ganador)+
   geom_bar(aes(x=siglas,fill=siglas))+
-  scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#4282D3", ERC = "#EEB661", "PSOE" = "#FF1616","UP" = "#A707FD","VOX"="#44C22B", "OTROS"="#889B98"))+
+  scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#4282D3", "ERC" = "#EEB661", "PSOE" = "#FF1616","UP" = "#A707FD","VOX"="#44C22B", "OTROS"="#889B98"))+
   labs(x="partidos",y="victorias", title = "¿Qué partido fue el ganador en cada una de las elecciones?", subtitle = "En los municipios con más de 100.000 habitantes (censo)")+
   facet_wrap(~fecha) +
   tema_favorito +
   coord_flip()
 ```
 
---- 
+------------------------------------------------------------------------
+
 ### ¿En qué sitios hay mayor participación? ¿Quién ganó en los sitios con mayor participación y donde menos? ¿A quién le beneficia la baja participación? PREGUNTA 3
 
 ```{r}
@@ -318,14 +314,57 @@ ganador_menor <- sitios |>
   
 ```
 
----
+------------------------------------------------------------------------
 
 ```{r}
 #| code-fold: true
 ggplot(ganador_mayor) + 
   geom_bar(aes(x = siglas, fill = siglas)) +
   scale_fill_manual(values = c("PP" = "#037be6", "PSOE" = "#e60603", "OTROS" = "#bdbdbd")) + 
-  tema_favorito
+  tema_favorito 
 
 ```
 
+------------------------------------------------------------------------
+
+### ¿Cómo calibrar el error de las encuestas (recordemos que las encuestas son de intención de voto a nivel nacional)?  PREGUNTA 5
+
+```{r}
+#| code-fold: true
+
+partidos_a_mantener <- c("PSOE", "PP", "CS", "EAJ-PNV", "BNG", "CIU", "ERC", "MP", "VOX", "EH-BILDU", "UP", "COMPROMIS")
+
+encuestas$partidos <- ifelse(encuestas$partidos %in% partidos_a_mantener, encuestas$partidos, "OTROs")
+
+encuestas_estimacion <- encuestas |> 
+  group_by(partidos) |>        # Agrupar por partidos y fecha
+  summarize(estimacion = sum(estimacion, na.rm = TRUE), .groups = "drop")
+encuestas_estimacion
+
+datos_votos <- datos |>  
+  group_by(siglas, fecha) %>%           # Agrupar por partidos y fecha
+  summarize(votos = sum(votos, na.rm = TRUE), .groups = "drop")
+datos_votos
+
+
+# Unir las tablas resumidas
+datos_calibrados <- encuestas_estimacion |> 
+  inner_join(datos_votos, by = c("partidos" = "siglas"), relationship = "many-to-many" )
+
+
+# Error
+datos_calibrados$error <- abs(datos_calibrados$estimacion - datos_calibrados$votos)
+datos_calibrados
+
+```
+
+```{r}
+#| code-fold: true
+
+ggplot(datos_calibrados, aes(x = reorder(partidos, error), y = error)) +
+  geom_bar(stat = "identity", fill = "#18a5da") +
+  labs(title = "Error absoluto por partido", x = "Partidos", y = "Error absoluto")+
+  tema_favorito +
+  coord_flip() 
+
+```
