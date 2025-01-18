@@ -288,12 +288,6 @@ porcentaje_grupo <-
 porcentaje_grupo
 ```
 
-```{r}
-#Prueba github desktop·
-```
-<<<<<<< Updated upstream
-=======
-
 --- 
 ### ¿En qué sitios hay mayor participación? ¿Quién ganó en los sitios con mayor participación y donde menos? ¿A quién le beneficia la baja participación? PREGUNTA 3
 
@@ -367,3 +361,4 @@ scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","CO
   tema_favorito+
   labs(x="Partidos" ,y="Victorias")
 ```
+---
