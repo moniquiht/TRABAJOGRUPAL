@@ -147,7 +147,7 @@ tema_favorito <-   theme_minimal() +
 
 ------------------------------------------------------------------------
 
-## ¿Qué partido fue el ganador en los municipios con más de 100.000 habitantes (censo) en cada una de las elecciones? P1
+### ¿Qué partido fue el ganador en los municipios con más de 100.000 habitantes (censo) en cada una de las elecciones? P1
 
 ```{r}
 #| code-fold: true
@@ -176,7 +176,7 @@ ggplot(partido_ganador)+
 
 ------------------------------------------------------------------------
 
-## ¿En qué sitios hay mayor participación? ¿Quién ganó en los sitios con mayor participación y donde menos? ¿A quién le beneficia la baja participación? P3
+### ¿En qué sitios hay mayor participación? ¿Quién ganó en los sitios con mayor participación y donde menos? ¿A quién le beneficia la baja participación? P3
 
 ```{r}
 #| code-fold: true
@@ -216,7 +216,7 @@ ggplot(ganador_mayor) +
 
 ------------------------------------------------------------------------
 
-## ¿Cómo analizar la relación entre censo y voto? ¿Es cierto que determinados partidos ganan en las zonas rurales? P4
+### ¿Cómo analizar la relación entre censo y voto? ¿Es cierto que determinados partidos ganan en las zonas rurales? P4
 
 ```{r}
 #| code-fold: true
@@ -231,6 +231,7 @@ menoscenso <- datos |>
 ```
 
 ```{r}
+#| code-fold: true
 ggplot(mascenso)+
   geom_bar(aes(x=siglas,fill=siglas))+
 scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","COMPROMIS"="salmon","PSOE"="#e60603","UP"="#D882EE","CIU"="#061ab0","EH-BILDU"="#056a24","ERC"="#d9f50b","MP"="#00FFFF","VOX"="green","BNG"="#5b1906","OTROS"="#bdbdbd"))+
@@ -240,6 +241,7 @@ scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","CO
 ```
 
 ```{r}
+#| code-fold: true
 ggplot(menoscenso)+
   geom_bar(aes(x=siglas,fill=siglas))+
 scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","COMPROMIS"="salmon","PSOE"="#e60603","UP"="#D882EE","CIU"="#061ab0","EH-BILDU"="#056a24","ERC"="#d9f50b","MP"="#00FFFF","VOX"="green","BNG"="#5b1906","OTROS"="#bdbdbd"))+
@@ -249,7 +251,7 @@ scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","CO
 
 ------------------------------------------------------------------------
 
-## ¿Cómo calibrar el error de las encuestas (recordemos que las encuestas son de intención de voto a nivel nacional)? P5
+### ¿Cómo calibrar el error de las encuestas (recordemos que las encuestas son de intención de voto a nivel nacional)? P5
 
 ```{r}
 #| code-fold: true
@@ -275,11 +277,13 @@ datos_calibrados <- encuestas_estimacion |>
 datos_calibrados$error <- abs(datos_calibrados$estimacion - datos_calibrados$votos)
 datos_calibrados
 
+
 ```
+
+---
 
 ```{r}
 #| code-fold: true
-
 ggplot(datos_calibrados, aes(x = reorder(partidos, error), y = error)) +
   geom_bar(stat = "identity", fill = "#18a5da") +
   labs(title = "Error absoluto por partido", x = "Partidos", y = "Error absoluto")+
@@ -290,7 +294,7 @@ ggplot(datos_calibrados, aes(x = reorder(partidos, error), y = error)) +
 
 ------------------------------------------------------------------------
 
-## ¿Cuáles son los municipios con mayor porcentaje de votos nulos de España? PEXTRA1
+### ¿Cuáles son los municipios con mayor porcentaje de votos nulos de España? PEXTRA1
 
 ```{r}
 #| code-fold: true
