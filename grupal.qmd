@@ -1,7 +1,6 @@
-
 ---
 title: "Entrega grupal"
-author: "David Repullo DNI: 05996834-K, Mónica Hortalá DNI: 02789123-M, Laura Lora DNI: 54195078-V, Chantal Zabala DNI: 71986129-Q"
+author: "David Repullo DNI 05996834K , Mónica Hortalá DNI 02789123M , Laura Lora DNI 54195078V , Chantal Zabala DNI 7198612Q"
 format:
   revealjs:
     theme: [style.scss]
@@ -9,22 +8,6 @@ format:
 execute: 
   echo: true
 ---
-
-## Instrucciones
-
--   Modificad dentro del documento .qmd vuestros datos personales (nombre y DNI) que se encuentran en el encabezado del archivo.
-
--   Aseguraos de que el archivo .qmd se renderice correctamente ANTES de continuar editando el documento y que el archivo .html correspondiente se genere en tu carpeta local en el ordenador.
-
-------------------------------------------------------------------------
-
-## Instrucciones
-
--   Los bloques de código (chunks) creados están vacíos o incompletos. Una vez que edites lo que consideres necesario, debes cambiar cada bloque a #\| eval: true (o eliminarlo directamente) para que se ejecuten.
-
--   Recuerda que puedes ejecutar los bloques de código uno por uno con el botón play o ejecutar todos los bloques hasta un bloque específico (con el botón situado a la izquierda del anterior).
-
-------------------------------------------------------------------------
 
 ## Paquetes necesarios
 
@@ -44,11 +27,7 @@ library(sysfonts)
 
 ------------------------------------------------------------------------
 
-## Entrega grupal
-
 ### Datos
-
-Un viejo amigo: la práctica se basará en los [**archivos de datos electorales**]{.hl-yellow} que se indican a continuación, recopilando datos sobre las elecciones al Congreso de los Diputados en España desde 2008 hasta la actualidad, así como encuestas, códigos de municipios y abreviaturas
 
 ```{r}
 # NO TOQUES NADA
@@ -57,36 +36,6 @@ cod_mun <- read_csv(file = "./data/cod_mun.csv")
 surveys <- read_csv(file = "./data/historical_surveys.csv")
 abbrev <- read_csv(file = "./data/siglas.csv")
 ```
-
-------------------------------------------------------------------------
-
-## Datos
-
--   `election_data`: archivo con las elecciones al congreso
--   `cod_mun`: archivo con los códigos y nombres de cada municipio
--   `abbrev`: siglas de cada partido
--   `surveys`: encuestas electorales desde 1982.
-
-------------------------------------------------------------------------
-
-## Datos
-
--   `surveys`: encuestas electorales desde 1982.
-    -   `type_survey`: tipo de encuesta (nacional, regional...)
-    -   `date_elec`: fecha de las futuras elecciones
-    -   `id_pollster`, `pollster`, `media`: id y nombre de la empresa encuestadora, así como medio que la encargó
-    -   `field_date_from`, `field_date_to`: fechas de inicio y fin del trabajo de la encuesta
-    -   `exit_poll`: ¿es una encuesta a pie de urna?
-    -   `size`: tamaño muestral de la encuesta
-    -   `turnout`: participación (estimación)
-
-------------------------------------------------------------------------
-
-## Objetivos
-
-El objetivo de la entrega es [**realizar un análisis de los datos electorales**]{.hl-green}, llevando a cabo la depuración, los resúmenes y los gráficos que consideres necesarios, tanto de los resultados como de la precisión de las encuestas electorales.
-
-En concreto, debes trabajar únicamente en el **período de tiempo que incluye las elecciones desde 2008 hasta las últimas elecciones de 2019**
 
 ------------------------------------------------------------------------
 
@@ -109,66 +58,6 @@ Además de lo que consideres oportuno realizar, los siguientes elementos son obl
 -   Se valorará no solo el contenido, sino también la presentación (estética).
 
 -   El objetivo es demostrar que se ha adquirido el máximo conocimiento del curso
-
-------------------------------------------------------------------------
-
-## Ítems obligatorios
-
-1.  Los datos deben ser convertidos a tidydata donde sea apropiado.
-
-2.  Debes incluir al menos un join entre tablas.
-
-3.  Recordatorio: información = varianza
-
-4.  Los paquetes `{glue}`, `{forcats}` y `{lubridate}` deben ser utilizados en algún punto
-
-5.  Los siguientes elementos deben usarse al menos una vez: mutate, summarise, group_by (o su equivalente), case_when
-
-6.  Deberéis definir al menos una función (con más de 5 líneas de código)
-
-------------------------------------------------------------------------
-
-## Ítems obligatorios
-
-7.  Contamos con muchos partidos que se presentan a las elecciones. Solo nos interesarán los siguientes partidos:
-
--   PARTIDO SOCIALISTA OBRERO ESPAÑOL (cuidado: tiene/tenía federaciones - sucursales - con otros nombres).
--   PARTIDO POPULAR
--   CIUDADANOS (cuidado: tiene/tenía federaciones - sucursales - con otros nombres).
--   PARTIDO NACIONALISTA VASCO
--   BLOQUE NACIONALISTA GALLEGO
--   CONVERGÈNCIA I UNIÓ
-
-------------------------------------------------------------------------
-
-## Ítems obligatorios
-
-7.  Contamos con muchos partidos que se presentan a las elecciones. Solo nos interesarán los siguientes partidos:
-
--   UNIDAS PODEMOS - IU (atención: aquí han tenido varios nombres - IU, Podem, Ezker Batua, ... - y no siempre se han presentado juntos, pero aquí los analizaremos como un conjunto).
--   ESQUERRA REPUBLICANA DE CATALUNYA
--   EH - BILDU (ahora son una coalición de partidos formada por Sortu, Eusko Alkartasuna, Aralar, Alternatiba).
--   MÁS PAÍS
--   VOX
-
-------------------------------------------------------------------------
-
-## Ítems obligatorios
-
-8.  Todo lo que no esté en alguno de los anteriores partidos debe ser correctamente reagrupado (y resumido) en `OTROS`
-
-9.  Las siglas deben ser usadas en las visualizaciones (ideas en <https://r-graph-gallery.com/>).
-
-10. Debes usar todos los archivos en algún momento.
-
-11. Debes descartar las encuestas que:
-
-```         
--   se refieran a elecciones anteriores a 2008
--   sean a pie de urna
--   tamaño muestral desconocido o inferior a 500.
--   tenga 1 día o menos de trabajo de campo.
-```
 
 ------------------------------------------------------------------------
 
@@ -258,7 +147,7 @@ tema_favorito <-   theme_minimal() +
 
 ------------------------------------------------------------------------
 
-### ¿Qué partido fue el ganador en los municipios con más de 100.000 habitantes (censo) en cada una de las elecciones? PREGUNTA 1
+## ¿Qué partido fue el ganador en los municipios con más de 100.000 habitantes (censo) en cada una de las elecciones? P1
 
 ```{r}
 #| code-fold: true
@@ -269,8 +158,6 @@ partido_ganador <- datos |>
   select(fecha,cod_mun,censo,siglas,votos) |> #seleccionamos solo lo relevante 
   slice_max(votos) |> #cogemos al ganador(el que tiene más votos)
   left_join(cod_mun,by="cod_mun") # traemos los municipios
-
-partido_ganador
 ```
 
 ------------------------------------------------------------------------
@@ -287,8 +174,9 @@ ggplot(partido_ganador)+
   coord_flip()
 ```
 
---- 
-### ¿En qué sitios hay mayor participación? ¿Quién ganó en los sitios con mayor participación y donde menos? ¿A quién le beneficia la baja participación? PREGUNTA 3
+------------------------------------------------------------------------
+
+## ¿En qué sitios hay mayor participación? ¿Quién ganó en los sitios con mayor participación y donde menos? ¿A quién le beneficia la baja participación? P3
 
 ```{r}
 #| code-fold: true
@@ -315,7 +203,7 @@ ganador_menor <- sitios |>
   
 ```
 
----
+------------------------------------------------------------------------
 
 ```{r}
 #| code-fold: true
@@ -325,8 +213,10 @@ ggplot(ganador_mayor) +
   tema_favorito
 
 ```
----
-### ¿Cómo analizar la relación entre censo y voto? ¿Es cierto que determinados partidos ganan en las zonas rurales? PREGUNTA 4
+
+------------------------------------------------------------------------
+
+## ¿Cómo analizar la relación entre censo y voto? ¿Es cierto que determinados partidos ganan en las zonas rurales? P4
 
 ```{r}
 #| code-fold: true
@@ -356,4 +246,61 @@ scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","CO
   tema_favorito+
   labs(x="Partidos" ,y="Victorias")
 ```
----
+
+------------------------------------------------------------------------
+
+## ¿Cómo calibrar el error de las encuestas (recordemos que las encuestas son de intención de voto a nivel nacional)? P5
+
+```{r}
+#| code-fold: true
+partidos_a_mantener <- c("PSOE", "PP", "CS", "EAJ-PNV", "BNG", "CIU", "ERC", "MP", "VOX", "EH-BILDU", "UP", "COMPROMIS")
+
+encuestas$partidos <- ifelse(encuestas$partidos %in% partidos_a_mantener, encuestas$partidos, "OTROs")
+
+encuestas_estimacion <- encuestas |> 
+  group_by(partidos) |>        # Agrupar por partidos y fecha
+  summarize(estimacion = sum(estimacion, na.rm = TRUE), .groups = "drop")
+encuestas_estimacion
+
+datos_votos <- datos |>  
+  group_by(siglas, fecha) %>%           # Agrupar por partidos y fecha
+  summarize(votos = sum(votos, na.rm = TRUE), .groups = "drop")
+datos_votos
+
+# Unir las tablas resumidas
+datos_calibrados <- encuestas_estimacion |> 
+  inner_join(datos_votos, by = c("partidos" = "siglas"), relationship = "many-to-many" )
+
+# Error
+datos_calibrados$error <- abs(datos_calibrados$estimacion - datos_calibrados$votos)
+datos_calibrados
+
+```
+
+```{r}
+#| code-fold: true
+
+ggplot(datos_calibrados, aes(x = reorder(partidos, error), y = error)) +
+  geom_bar(stat = "identity", fill = "#18a5da") +
+  labs(title = "Error absoluto por partido", x = "Partidos", y = "Error absoluto")+
+  tema_favorito +
+  coord_flip() 
+
+```
+
+------------------------------------------------------------------------
+
+## ¿Cuáles son los municipios con mayor porcentaje de votos nulos de España? PEXTRA1
+
+```{r}
+#| code-fold: true
+porcentaje_nulos <- datos |> 
+  group_by(cod_mun) |> 
+  summarise(porcentaje_votos_nulos = (sum(votos_nulos) / sum(votos_candidaturas)) * 100)
+
+ej_extra1 <-
+  porcentaje_nulos |> left_join(cod_mun,by="cod_mun") |> 
+  arrange(desc(porcentaje_votos_nulos)) |> head(10)  # Muestra los 10 primeros municipios
+
+ej_extra1
+```
