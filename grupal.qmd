@@ -1,6 +1,3 @@
-```{r}
-
-```
 
 ---
 title: "Entrega grupal"
@@ -328,4 +325,35 @@ ggplot(ganador_mayor) +
   tema_favorito
 
 ```
+---
+### ¿Cómo analizar la relación entre censo y voto? ¿Es cierto que determinados partidos ganan en las zonas rurales? PREGUNTA 4
 
+```{r}
+#| code-fold: true
+mascenso <- datos |> 
+  filter(censo>10000) |> 
+  group_by(cod_mun) |> 
+  slice_max(votos)
+menoscenso <- datos |>
+  filter(censo<10000)|> 
+  group_by(cod_mun) |> 
+  slice_max(votos)
+```
+
+```{r}
+ggplot(mascenso)+
+  geom_bar(aes(x=siglas,fill=siglas))+
+scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","COMPROMIS"="salmon","PSOE"="#e60603","UP"="#D882EE","CIU"="#061ab0","EH-BILDU"="#056a24","ERC"="#d9f50b","MP"="#00FFFF","VOX"="green","BNG"="#5b1906","OTROS"="#bdbdbd"))+
+  tema_favorito+
+  theme(axis.text.x=element_text(angle=30))+
+  labs(x="Partidos" ,y="Victorias")
+```
+
+```{r}
+ggplot(menoscenso)+
+  geom_bar(aes(x=siglas,fill=siglas))+
+scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","COMPROMIS"="salmon","PSOE"="#e60603","UP"="#D882EE","CIU"="#061ab0","EH-BILDU"="#056a24","ERC"="#d9f50b","MP"="#00FFFF","VOX"="green","BNG"="#5b1906","OTROS"="#bdbdbd"))+
+  tema_favorito+
+  labs(x="Partidos" ,y="Victorias")
+```
+---
