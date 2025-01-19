@@ -318,21 +318,6 @@ ej_extra1
 
 ---
 
-### ¿Cuál ha sido la evolución del porcentaje de participación electoral en los municipios de mas de 95000 habitantes a lo largo del tiempo? PEXTRA LAURA
-```{r}
-#| code-fold: true
-
-# Filtramos municipios con más de 95,000 habitantes y calculamos participación
-participacion_evolucion <- datos |>
-  filter(censo > 95000) |>
-  group_by(fecha) |>
-  summarise(participacion_media = mean((votos_candidaturas + votos_blancos + votos_nulos) / censo * 100, na.rm = TRUE)
-  )
-
-```
-
----
-
 ### ¿Qué partidos dominan donde los municipios tienen menos de 5 mesas electorales?
 ```{r}
 #| code-fold: true
@@ -361,6 +346,40 @@ scale_fill_manual(values=c("EUZKO ALDERDI JELTZALEA-PARTIDO NACIONALISTA VASCO"=
   tema_favorito+
   theme(axis.text.x=element_text(angle=10, hjust = 1, size = 6))+
   labs(x="Partido" ,y="Numero de provincias")
+
+```
+
+---------
+
+### ¿Cuál ha sido la evolución del porcentaje de participación electoral en los municipios a lo largo del tiempo? 
+
+```{r}
+#| code-fold: true
+
+# Agrupamos por fecha y calculamos participación
+participacion_evolucion <- datos |> 
+  group_by(fecha) |>
+  summarise(participacion_media = mean((votos_candidaturas + votos_blancos + votos_nulos) 
+                                       / censo * 100, na.rm = TRUE))
+participacion_evolucion
+
+```
+
+---
+
+```{r}
+#| code-fold: true
+
+ggplot(participacion_evolucion, aes(x = fecha, y = participacion_media)) +
+  geom_segment(aes(x = fecha, xend = fecha, y = 0, yend = participacion_media), color = "gray70") +
+  geom_point(aes(color = participacion_media), size = 6) +
+  scale_color_gradient(low = "blue", high = "red") +
+  scale_y_continuous(limits = c(0, 80), breaks = seq(0, 80, 15)) +
+  labs(x = "Año", y = "Porcentaje de Participación (%)",
+    title = "Evolución de la Participación Electoral en Municipios Grandes",
+    subtitle = "Análisis municipios a lo largo del tiempo",
+    color = "Participación (%)" ) +
+  tema_favorito
 
 ```
 
