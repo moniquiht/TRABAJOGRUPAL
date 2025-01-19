@@ -39,28 +39,6 @@ abbrev <- read_csv(file = "./data/siglas.csv")
 
 ------------------------------------------------------------------------
 
-## Algunos comentarios
-
-Además de lo que consideres oportuno realizar, los siguientes elementos son obligatorios:
-
--   Cada grupo debe presentar [**antes del 17 de enero (23:59)**]{.hl-red} un análisis de los datos en formato .qmd y .html, en modo Quarto slides, que serán los que presentarán el día de la exposición.
-
--   Las Quarto slides deben subirse a Github (un miembro de cada grupo deberá proporcionar el enlace).
-
--   El número máximo de diapositivas será de 45. El tiempo máximo para cada grupo será de 22 minutos (+5-10 minutos para preguntas).
-
-------------------------------------------------------------------------
-
-## Algunos comentarios
-
--   Durante la presentación, deberéis explicar (de manera resumida) el análisis realizado, asegurándoos de que cada miembro del equipo hable durante un tiempo similar y que cualquier miembro pueda responder preguntas sobre cualquiera de los pasos realizados. La nota no será la misma para todos los integrantes.
-
--   Se valorará no solo el contenido, sino también la presentación (estética).
-
--   El objetivo es demostrar que se ha adquirido el máximo conocimiento del curso
-
-------------------------------------------------------------------------
-
 ## PREPARACIÓN DATOS
 
 ```{r}
@@ -352,3 +330,37 @@ participacion_evolucion <- datos |>
   )
 
 ```
+
+---
+
+### ¿Qué partidos dominan donde los municipios tienen menos de 5 mesas electorales?
+```{r}
+#| code-fold: true
+datos_mesas_pequenas <- datos |> 
+  filter(numero_mesas < 5)
+partido_ganador_mesas_pequenas <- datos_mesas_pequenas |> 
+  group_by(codigo_provincia, partidos) |> 
+  summarise(votos_totales = sum(votos, na.rm = TRUE)) |> 
+  arrange(desc(votos_totales)) |> 
+  group_by(codigo_provincia) |> 
+  slice_max(order_by = votos_totales, n = 1)
+partidos_dominantes_provincias <- partido_ganador_mesas_pequenas |> 
+  group_by(partidos) |> 
+  summarise(num_provincias_ganadas = n(), .groups = "drop") |> 
+  arrange(desc(num_provincias_ganadas))
+#Las 3 provincias que en las que gana el PNV son las del Pais Vasco
+#Las 2 provincias que gana el PARTIT COMUNISTA DEL POBLE DE CATALUNYA son Girona y Lleida
+#Las 2 provincias que gana el PARTIT DELS SOCIALISTES DE CATALUNYA son Barcelona y Tarragona
+```
+
+```{r}
+#| code-fold: true
+ggplot(partidos_dominantes_provincias, aes(x= reorder(partidos, -num_provincias_ganadas), y = num_provincias_ganadas, fill = partidos))+
+  geom_col()+
+scale_fill_manual(values=c("EUZKO ALDERDI JELTZALEA-PARTIDO NACIONALISTA VASCO"="#4B9438","PARTIDO POPULAR"="#037be6","PARTIDO SOCIALISTA OBRERO ESPAÑOL"="#e60603","PARTIT COMUNISTA DEL POBLE DE CATALUNYA"= "#f8e20b", "PARTIT DELS SOCIALISTES DE CATALUNYA"= "#16f80b"))+ 
+  tema_favorito+
+  theme(axis.text.x=element_text(angle=10, hjust = 1, size = 6))+
+  labs(x="Partido" ,y="Numero de provincias")
+
+```
+
