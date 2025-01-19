@@ -349,10 +349,9 @@ scale_fill_manual(values=c("EUZKO ALDERDI JELTZALEA-PARTIDO NACIONALISTA VASCO"=
 
 ```
 
----------
+---
 
 ### ¿Cuál ha sido la evolución del porcentaje de participación electoral en los municipios a lo largo del tiempo? 
-
 ```{r}
 #| code-fold: true
 
