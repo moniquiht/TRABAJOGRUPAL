@@ -61,56 +61,9 @@ Además de lo que consideres oportuno realizar, los siguientes elementos son obl
 
 ------------------------------------------------------------------------
 
-## Ítems obligatorios
-
-12. Deberás responder obligatoriamente a las siguientes preguntas (más aquellas que consideres analizar para distinguirte del resto)
-
--   ¿Qué partido fue el ganador en los municipios con más de 100.000 habitantes (censo) en cada una de las elecciones?
-
--   ¿Qué partido fue el segundo cuando el primero fue el PSOE? ¿Y cuando el primero fue el PP?
-
--   ¿A quién beneficia la baja participación?
-
--   ¿Cómo analizar la relación entre censo y voto? ¿Es cierto que determinados partidos ganan en las zonas rurales?
-
-------------------------------------------------------------------------
-
-## Ítems obligatorios
-
--   ¿Cómo calibrar el error de las encuestas (recordemos que las encuestas son de intención de voto a nivel nacional)?
-
--   ¿Qué casas encuestadoras acertaron más y cuáles se desviaron más de los resultados?
-
-Debes incluir [**al menos 3 preguntas "originales" más**]{.hl-orange} que consideres interesantes de responder utilizando los datos.
-
-------------------------------------------------------------------------
-
-## Evaluación
-
-No se valorará más a quien haga más cosas.
-
-Más no siempre es mejor
-
-Se valorará la originalidad (en comparación con el resto de trabajos, ya sea en lo analizado, en el tema tratado, etc.), el cariño puesto en la entrega (el cariño en la vida es importante) y la relevancia de lo realizado.
-
-------------------------------------------------------------------------
-
-## Evaluación
-
-Una vez que tengas los elementos obligatorios de tu base de datos más o menos completos, piensa antes de escribir código: ¿qué podría ser interesante? ¿Qué necesito para obtener un resumen tanto numérico como visual?
-
-Recuerda que el objetivo real es demostrar un dominio de las herramientas vistas a lo largo del curso. Y eso no se mide solo por la cantidad de herramientas utilizadas, sino también por la calidad en su ejecución.
-
-Deberéis tenerlo todo subido a Github con el enlace generado de manera correcta.
-
-## ENTREGA GRUPAL
-
-------------------------------------------------------------------------
-
 ## PREPARACIÓN DATOS
 
 ```{r}
-#| code-fold: true
 
 datos <- election_data |>
   pivot_longer(cols="BERDEAK-LOS VERDES":"COALICIÓN POR MELILLA",names_to = "partidos",values_to="votos",values_drop_na=TRUE) |>  select(-tipo_eleccion, -vuelta, -codigo_distrito_electoral) 
@@ -147,7 +100,7 @@ tema_favorito <-   theme_minimal() +
 
 ------------------------------------------------------------------------
 
-### ¿Qué partido fue el ganador en los municipios con más de 100.000 habitantes (censo) en cada una de las elecciones? P1
+### ¿Qué partido fue el ganador en los municipios con más de 100.000 habitantes (censo) en cada una de las elecciones?
 
 ```{r}
 #| code-fold: true
@@ -158,12 +111,6 @@ partido_ganador <- datos |>
   select(fecha,cod_mun,censo,siglas,votos) |> #seleccionamos solo lo relevante 
   slice_max(votos) |> #cogemos al ganador(el que tiene más votos)
   left_join(cod_mun,by="cod_mun") # traemos los municipios
-```
-
-------------------------------------------------------------------------
-
-```{r}
-#| code-fold: true
 
 ggplot(partido_ganador)+
   geom_bar(aes(x=siglas,fill=siglas))+
@@ -176,7 +123,40 @@ ggplot(partido_ganador)+
 
 ------------------------------------------------------------------------
 
-### ¿En qué sitios hay mayor participación? ¿Quién ganó en los sitios con mayor participación y donde menos? ¿A quién le beneficia la baja participación? P3
+### ¿Qué partido fue el segundo cuando el primero fue el PSOE? ¿Y cuando el primero fue el PP?
+
+```{r}
+#| code-fold: true
+ n_votado <- function(partidos, votos, n = 1) {
+  
+  datos <- tibble(partidos, votos) 
+  siglas <-
+    datos |>
+    slice_max(n = n, votos, with_ties = FALSE) |> 
+    slice_min(n = 1, votos, with_ties = FALSE) |> 
+    pull(partidos)
+  
+  return(siglas)
+}
+
+primiseg<-
+ datos  |> summarise(votostot=sum(votos),.by=c(siglas,fecha)) |> group_by(fecha) |> 
+  mutate(ganador = n_votado(siglas, votostot),
+         segundo = n_votado(siglas, votostot, n = 2))
+# PP PRIMERO
+pp_1 <- primiseg |> 
+  filter(ganador == "PP")  |> select(fecha,ganador,segundo) |> distinct(fecha,.keep_all = TRUE)
+#PSOE PRIMERO 
+psoe_1 <- primiseg |> 
+  filter(ganador == "PSOE")  |> select(fecha,ganador,segundo) |> distinct(fecha,.keep_all = TRUE)
+
+pp_1
+psoe_1
+```
+
+------------------------------------------------------------------------
+
+### ¿A quién le beneficia la baja participación?
 
 ```{r}
 #| code-fold: true
@@ -191,32 +171,34 @@ mayor_part <- datos |>
 sitios <- mayor_part |>  
   select(cod_mun, municipio, part_relativa, siglas) |> 
   arrange(desc(part_relativa))
-#Después de esta tabla nos quedamos con los municipios, las participaciones relativas y las siglas de los partidos. Para poder ver dónde hay mayor participación.
-
-ganador_mayor <- sitios |> 
-  slice_max(part_relativa, n = 100)
-#Obtenemos el partido ganador en los sitios con mayor participación
+#Después de esta tabla nos quedamos con los municipios, las participaciones relativas y las siglas de los partidos. Para poder ver dónde hay mayor o menor participación.
 
 ganador_menor <- sitios |> 
   slice_min(part_relativa, n = 100)
-#Aquí en los sitios donde menor participación había.
-  
-```
+#Obtenemos el ganador en los sitios donde menor participación había.
 
-------------------------------------------------------------------------
-
-```{r}
-#| code-fold: true
-ggplot(ganador_mayor) + 
+ggplot(ganador_menor) + 
   geom_bar(aes(x = siglas, fill = siglas)) +
-  scale_fill_manual(values = c("PP" = "#037be6", "PSOE" = "#e60603", "OTROS" = "#bdbdbd")) + 
+  scale_fill_manual(values = c("PP" = "#037be6", "PSOE" = "#e60603", "EAJ-PNV"="#4B9438", "CS"="#FF7518", "UP"="#D882EE", "CIU"="#061ab0", "OTROS" = "#bdbdbd")) + 
   tema_favorito
 
 ```
 
+---
+
+### Resultado
+```{r}
+#| code-fold: true
+beneficiario <- ganador_menor |> 
+  count(siglas, sort = TRUE) |> 
+  slice(1)
+beneficiario
+#De la tabla de los ganadores donde hay menor participación, veo cuál es el partido que más veces aparece. Ese es el partido que sale beneficiado con la baja participación
+```
+
 ------------------------------------------------------------------------
 
-### ¿Cómo analizar la relación entre censo y voto? ¿Es cierto que determinados partidos ganan en las zonas rurales? P4
+### ¿Cómo analizar la relación entre censo y voto? ¿Es cierto que determinados partidos ganan en las zonas rurales?
 
 ```{r}
 #| code-fold: true
@@ -228,17 +210,17 @@ menoscenso <- datos |>
   filter(censo<10000)|> 
   group_by(cod_mun) |> 
   slice_max(votos)
-```
 
-```{r}
-#| code-fold: true
 ggplot(mascenso)+
   geom_bar(aes(x=siglas,fill=siglas))+
 scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","COMPROMIS"="salmon","PSOE"="#e60603","UP"="#D882EE","CIU"="#061ab0","EH-BILDU"="#056a24","ERC"="#d9f50b","MP"="#00FFFF","VOX"="green","BNG"="#5b1906","OTROS"="#bdbdbd"))+
   tema_favorito+
   theme(axis.text.x=element_text(angle=30))+
   labs(x="Partidos" ,y="Victorias")
+
 ```
+
+------------------------------------------------------------------------
 
 ```{r}
 #| code-fold: true
@@ -247,11 +229,12 @@ ggplot(menoscenso)+
 scale_fill_manual(values=c("EAJ-PNV"="#4B9438","PP"="#037be6","CS"="#FF7518","COMPROMIS"="salmon","PSOE"="#e60603","UP"="#D882EE","CIU"="#061ab0","EH-BILDU"="#056a24","ERC"="#d9f50b","MP"="#00FFFF","VOX"="green","BNG"="#5b1906","OTROS"="#bdbdbd"))+
   tema_favorito+
   labs(x="Partidos" ,y="Victorias")
+
 ```
 
 ------------------------------------------------------------------------
 
-### ¿Cómo calibrar el error de las encuestas (recordemos que las encuestas son de intención de voto a nivel nacional)? P5
+### ¿Cómo calibrar el error de las encuestas (recordemos que las encuestas son de intención de voto a nivel nacional)?
 
 ```{r}
 #| code-fold: true
@@ -262,12 +245,10 @@ encuestas$partidos <- ifelse(encuestas$partidos %in% partidos_a_mantener, encues
 encuestas_estimacion <- encuestas |> 
   group_by(partidos) |>        # Agrupar por partidos y fecha
   summarize(estimacion = sum(estimacion, na.rm = TRUE), .groups = "drop")
-encuestas_estimacion
 
 datos_votos <- datos |>  
   group_by(siglas, fecha) %>%           # Agrupar por partidos y fecha
   summarize(votos = sum(votos, na.rm = TRUE), .groups = "drop")
-datos_votos
 
 # Unir las tablas resumidas
 datos_calibrados <- encuestas_estimacion |> 
@@ -280,7 +261,7 @@ datos_calibrados
 
 ```
 
----
+------------------------------------------------------------------------
 
 ```{r}
 #| code-fold: true
@@ -294,8 +275,56 @@ ggplot(datos_calibrados, aes(x = reorder(partidos, error), y = error)) +
 
 ------------------------------------------------------------------------
 
-### ¿Cuáles son los municipios con mayor porcentaje de votos nulos de España? PEXTRA1
+### ¿Qué casas encuestadoras acertaron más y cuáles se desviaron más de los resultados?
+```{r}
+#| code-fold: true
+siglas<-c("PP", "VOX","PSOE", "UP", "MP", "UNIDAS PODEMOS","EAJ_PNV"," CS")
 
+datos_encuestas<- datos |> filter(anno>2007)
+votos<-datos_encuestas |> 
+  group_by(fecha) |> 
+  distinct(cod_mun,.keep_all = TRUE) |>
+  mutate(total_vot_cand=sum(votos_candidaturas)) |> 
+  select(fecha,total_vot_cand) |> 
+  distinct(fecha,.keep_all = TRUE)
+
+proporcion_votos<- datos_encuestas |>
+  group_by(fecha,siglas) |>
+  mutate(votos_part=sum(votos)) |>
+  ungroup() |>
+  left_join(votos,by="fecha") |>
+  mutate(proporcion=(votos_part/total_vot_cand)*100) |>
+  select(fecha,siglas,votos_part,total_vot_cand,proporcion) |> 
+  group_by(fecha) |> 
+  distinct(siglas,.keep_all = TRUE) |> 
+  ungroup()
+
+
+proporcion_votos <- proporcion_votos |>
+  rename(partidos=siglas) |> 
+  rename(date_elec=fecha) |> 
+  select(date_elec,partidos,proporcion)
+
+casas_de_encuestas <-encuestas |>
+  drop_na(media) |> 
+  mutate(date_elec=date_elec-day(date_elec)+1) |> 
+  group_by(date_elec,media,partidos) |>
+  inner_join(proporcion_votos,by =c("partidos","date_elec")) |> 
+  group_by(media) |> 
+  summarise(error_final=mean((estimacion-proporcion)^2)) 
+
+ggplot(casas_de_encuestas,aes(x=media,y=error_final,color=media))+
+  geom_point()+
+   geom_segment( aes(x=media, xend=media, y=0, yend=error_final))+
+  theme_minimal()+theme(axis.text.x = element_blank()) +
+  labs(x="",y="error")+
+  theme(legend.position="bottom")
+
+```
+
+------------------------------------------------------------------------
+
+### ¿Cuáles son los municipios con mayor porcentaje de votos nulos de España?
 ```{r}
 #| code-fold: true
 porcentaje_nulos <- datos |> 
@@ -307,4 +336,19 @@ ej_extra1 <-
   arrange(desc(porcentaje_votos_nulos)) |> head(10)  # Muestra los 10 primeros municipios
 
 ej_extra1
+```
+
+---
+
+### ¿Cuál ha sido la evolución del porcentaje de participación electoral en los municipios de mas de 95000 habitantes a lo largo del tiempo? PEXTRA LAURA
+```{r}
+#| code-fold: true
+
+# Filtramos municipios con más de 95,000 habitantes y calculamos participación
+participacion_evolucion <- datos |>
+  filter(censo > 95000) |>
+  group_by(fecha) |>
+  summarise(participacion_media = mean((votos_candidaturas + votos_blancos + votos_nulos) / censo * 100, na.rm = TRUE)
+  )
+
 ```
